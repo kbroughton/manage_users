@@ -1,0 +1,11 @@
+---
+# tasks file for manage_users
+
+
+- name: create groups requried for the target
+  group:
+    name: "{{item.name}}"
+  with_items: manage_users_linux_groups
+
+
+- include: add_users.yml

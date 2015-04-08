@@ -1,0 +1,61 @@
+---
+# add_users.yml
+
+# adds the users in user_dict to the matching services in service_user_dict
+# and potentially to hosts in host_user_dict
+# optionally, remove any users not in the list if manage_users_add_strict
+
+# user_dict:
+#   ldap_name:
+#   email:
+#   pub_keys: { default: id_rsa, aws: kbroughton.pem,}
+#   
+
+# SERVICE USER DICT
+# For dealing with proxies and load balancing 
+# service_user_dict:
+#   galaxies: 
+#
+
+# HOST LOGIN USER DICT
+# For dealing directly with servers or autopopulate this with service discovery
+# host_login_user_dict
+#   10.0.100.33: 
+#     sudo_users:
+#       ubuntu
+#     users:
+#       user1
+#       user2 
+# eventually this will have integrations with LastPass and other accounts
+
+- debug: msg="{{groups}}"
+- debug: msg="{{user_dict}}"
+- debug: msg="{{manage_users_ssh}}"
+
+- name: add users to the target 
+  user:
+    name: "{{item.username}}"
+    generate_ssh_key: yes
+    groups: "{% for elt in manage_users_linux_groups%}{% if item.username in elt.members %}{{elt.name}},{% endif %}{% endfor%}"
+    shell: /bin/bash
+  with_items: user_dict
+  when: "{{item.username in manage_users_ssh}}"
+
+- name: add pubkeys to authorized_keys
+  authorized_key:
+    user: "{{item.0.username}}"
+    key: "{{item.1}}"
+  with_subelements: 
+   - user_dict
+   - pub_keys
+  when: "{{item.0.username in manage_users_ssh}}"
+
+- debug: msg="{{manage_users_sudoers}}"
+
+- name: allow passwordless sudo 
+  template:
+    src: sudoers.d
+    dest: /etc/sudoers.d/{{item}}
+    mode: 0440
+    validate: 'visudo -cf %s'
+  with_items: manage_users_sudoers

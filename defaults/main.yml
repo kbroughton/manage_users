@@ -1,0 +1,33 @@
+---
+# defaults file for manage_users
+
+manage_users_sudoers: []
+
+manage_users_target_groups: []
+
+manage_users_linux_groups: []
+# EXAMPLE
+# mda_datascientists:
+#  - mdobson
+#  - aacharya
+#  - tfolkman
+
+# mda_solutions:
+#  - snagamalla
+#  - pkasturi
+
+# manage_users_acls:
+#  sudo: "{{ mda_datascientists | list }}"
+#  ssh_access: "{{ mda_solutions + mda_datascientists | list }}"
+#  ipython_access: "{{ mda_solutions + mda_datascientists | list }}"
+
+# manage_users_ssh: "{{mda_solutions + mda_datascientists | list}}"
+# manage_users_sudoers: "{{mda_solutions + mda_datascientists | list}}"
+
+# manage_users_linux_groups:
+#  - name: anaconda 
+#    members: "{{manage_users_acls.ipython_access}}" 
+#  - name: ipy_users
+#    members: "{{manage_users_acls.ipython_access}}"
+#  - name: sudo
+#    members: "{{manage_users_acls.sudo}}" 
