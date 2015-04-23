@@ -9,3 +9,5 @@
 
 
 - include: add_users.yml
+  tags:
+   - add_users
